@@ -1,25 +1,28 @@
 import mongoose from "mongoose";
+
 const teamSchema = new mongoose.Schema({
-  teamName: String,
-  leader: {
-    name: String,
-    email: String,
-    phone: String,
-    studentNumber: String,
-    year: String,
-    section: String,
-    gender: String,
-    residency: String,
-  },
-  members: [
-    {
-      name: String,
-      studentNumber: String,
-      year: String,
-      section: String,
-      gender: String,
-      residency: String,
+    teamName: { type: String, required: true },
+    leader: {
+        name: { type: String, required: true },
+        studentNumber: { type: String, required: true },
+        year: { type: String, required: true },
+        section: { type: String, required: true },
+        gender: { type: String, required: true },
+        residency: { type: String, required: true },
+        email: { type: String, required: true, unique: true },
+        mobile: { type: String, required: true }
     },
-  ],
+    members: [
+        {
+            name: { type: String, required: true },
+            studentNumber: { type: String, required: true },
+            year: { type: String, required: true },
+            section: { type: String, required: true },
+            gender: { type: String, required: true },
+            residency: { type: String, required: true }
+        }
+    ]
 });
-export default mongoose.model("Team", teamSchema);
+
+const Team = mongoose.model("Team", teamSchema);
+export default Team;
