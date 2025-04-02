@@ -1,7 +1,10 @@
 import express from "express";
+import axios from "axios";
 import Joi from "joi";
 import Team from "../models/Team.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 const router = express.Router();
 
 // Define validation schema using Joi
@@ -31,13 +34,27 @@ const teamSchema = Joi.object({
 
 // Route: Register a new team
 router.post("/register", async (req, res) => {
-    const { error } = teamSchema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+    const {"g-recaptcha-response": recaptchaToken, ...teamData} = req.body; 
+    if(!recaptchaToken){
+        return res.status(400).json({message:"reCAPTCHA challenge incomplete"})
     }
+    try{
+        const response = await axios.post(``, null,{
+            params:{
+                secret: process.env.reCAPTCHA_secret_key,
+                response: recaptchaToken
+            }
+        })
+        if(!response.data.success){
+            return res.status(400).json({message:"reCAPTCHA verification failed!"})
+        }
+        
+        const { error} = teamSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
 
-    try {
-        const newTeam = new Team(req.body);
+        const newTeam = new Team(teamData);
         await newTeam.save();
         res.status(201).json({ message: "Team registered successfully!" });
     } catch (err) {
