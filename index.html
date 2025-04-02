@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Registration</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <h2>Team Registration Form</h2>
+    <form action="http://localhost:5000/api/teams/register" method="POST">
+        <label>Team Name:</label>
+        <input type="text" name="teamName" required><br><br>
+
+        <h3>Leader Details</h3>
+        <label>Name:</label>
+        <input type="text" name="leader[name]" required><br>
+
+        <label>Student Number:</label>
+        <input type="text" name="leader[studentNumber]" required><br>
+
+        <label>Year:</label>
+        <input type="text" name="leader[year]" required><br>
+
+        <label>Section:</label>
+        <input type="text" name="leader[section]" required><br>
+
+        <label>Gender:</label>
+        <select name="leader[gender]" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <label>Residency:</label>
+        <select name="leader[residency]" required>
+            <option value="Hosteller">Hosteller</option>
+            <option value="Day Scholar">Day Scholar</option>
+        </select><br>
+
+        <label>Email:</label>
+        <input type="email" name="leader[email]" required><br>
+
+        <label>Mobile:</label>
+        <input type="text" name="leader[mobile]" required><br><br>
+
+        <h3>Member 1</h3>
+        <label>Name:</label>
+        <input type="text" name="members[0][name]" required><br>
+
+        <label>Student Number:</label>
+        <input type="text" name="members[0][studentNumber]" required><br>
+
+        <label>Year:</label>
+        <input type="text" name="members[0][year]" required><br>
+
+        <label>Section:</label>
+        <input type="text" name="members[0][section]" required><br>
+
+        <label>Gender:</label>
+        <select name="members[0][gender]" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <label>Residency:</label>
+        <select name="members[0][residency]" required>
+            <option value="Hosteller">Hosteller</option>
+            <option value="Day Scholar">Day Scholar</option>
+        </select><br><br>
+
+        <h3>Member 2</h3>
+        <label>Name:</label>
+        <input type="text" name="members[1][name]" required><br>
+
+        <label>Student Number:</label>
+        <input type="text" name="members[1][studentNumber]" required><br>
+
+        <label>Year:</label>
+        <input type="text" name="members[1][year]" required><br>
+
+        <label>Section:</label>
+        <input type="text" name="members[1][section]" required><br>
+
+        <label>Gender:</label>
+        <select name="members[1][gender]" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <label>Residency:</label>
+        <select name="members[1][residency]" required>
+            <option value="Hosteller">Hosteller</option>
+            <option value="Day Scholar">Day Scholar</option>
+        </select><br><br>
+
+        <!-- Google reCAPTCHA -->
+        <div class="g-recaptcha" data-sitekey="6LeI3gcrAAAAAANPT-tLYhDMGtEnfZkpCcd7Ki4M"></div><br>
+
+        <button type="submit">Register Team</button>
+    </form>
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault(); // Prevent page reload
+        
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData); // Convert form data to JSON
+        
+            const response = await fetch("http://localhost:5000/api/teams/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+        
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert("✅ " + result.message);
+            } else {
+                alert("❌ " + result.message);
+            }
+        });
+        </script>
+        
+</body>
+</html>
