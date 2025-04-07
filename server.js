@@ -15,7 +15,7 @@ const app = express();
 
 //  CORS setup
 const corsOptions = {
-  origin: "http://127.0.0.1:5500", // Replace with your frontend domain
+  origin: "http://localhost:5173/", // Replace with your frontend domain
   methods: ["POST"]
 };
 app.use(cors(corsOptions));
