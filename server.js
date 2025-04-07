@@ -14,11 +14,7 @@ connectDB();
 const app = express(); 
 
 //  CORS setup
-const corsOptions = {
-  origin: "http://localhost:5173/", // Replace with your frontend domain
-  methods: ["POST"]
-};
-app.use(cors(corsOptions));
+app.use(cors());
 
 //  Security middlewares
 app.use(express.json());
