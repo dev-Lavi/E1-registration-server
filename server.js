@@ -1,5 +1,4 @@
-
-import express from "express";
+import express from "express"; 
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import teamRoutes from "./api/teamRoutes.js";
@@ -12,6 +11,11 @@ dotenv.config();
 connectDB();
 
 const app = express(); 
+
+// ✅ Trust proxy for accurate IP detection (especially with rate limiter)
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 //  CORS setup
 app.use(cors());
