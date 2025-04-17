@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"; 
 import axios from "axios";
 import Team from "../models/Team.js";
 import dotenv from "dotenv";
@@ -41,24 +41,41 @@ router.post("/register", validateTeam, async (req, res) => {
     // Trim teamName to avoid accidental duplicates with extra spaces
     req.body.teamName = req.body.teamName.trim();
 
-    // Duplicate check
-    const existingTeam = await Team.findOne({
-      $or: [
-        { teamName: req.body.teamName },
-        { "leader.email": req.body.leader.email },
-        { "leader.studentNumber": req.body.leader.studentNumber },
-        { "leader.mobile": req.body.leader.mobile },
-        {
-          "members.studentNumber": {
-            $in: req.body.members.map((m) => m.studentNumber)
-          }
-        }
-      ]
-    });
+    // Conflict checks one-by-one
+    const duplicateFields = [];
 
-    if (existingTeam) {
+    const teamWithSameName = await Team.findOne({ teamName: req.body.teamName });
+    if (teamWithSameName) {
+      duplicateFields.push("Team name is already taken");
+    }
+
+    const leaderEmailExists = await Team.findOne({ "leader.email": req.body.leader.email });
+    if (leaderEmailExists) {
+      duplicateFields.push("Leader email is already registered");
+    }
+
+    const leaderStudentNumberExists = await Team.findOne({ "leader.studentNumber": req.body.leader.studentNumber });
+    if (leaderStudentNumberExists) {
+      duplicateFields.push("Leader student number is already registered");
+    }
+
+    const leaderMobileExists = await Team.findOne({ "leader.mobile": req.body.leader.mobile });
+    if (leaderMobileExists) {
+      duplicateFields.push("Leader mobile number is already registered");
+    }
+
+    const memberStudentNumbers = req.body.members.map(m => m.studentNumber);
+    const conflictingMember = await Team.findOne({
+      "members.studentNumber": { $in: memberStudentNumbers }
+    });
+    if (conflictingMember) {
+      duplicateFields.push("One or more team member student numbers are already registered");
+    }
+
+    if (duplicateFields.length > 0) {
       return res.status(409).json({
-        message: "Team name or a team member/leader is already registered."
+        message: "Duplicate data found",
+        conflicts: duplicateFields
       });
     }
 
