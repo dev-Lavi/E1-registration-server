@@ -2,10 +2,84 @@ import express from "express";
 import axios from "axios";
 import Team from "../models/Team.js";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 import { validateTeam } from "../middleware/validateTeam.js";
 
 dotenv.config();
 const router = express.Router();
+
+const otpStore = new Map(); 
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.MAIL_SENDER,
+    pass: process.env.MAIL_PASSWORD
+  }
+});
+
+
+router.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: "Leader email is required" });
+
+  const trimmedEmail = email.trim();
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+  otpStore.set(trimmedEmail, { otp, expiresAt });
+
+  const mailOptions = {
+    from: `"Event Team" <${process.env.MAIL_SENDER}>`,
+    to: trimmedEmail,
+    subject: "OTP Verification - Team Registration",
+    html: `<p>Your OTP for team registration is: <b>${otp}</b><br>It is valid for 5 minutes.</p>`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "OTP sent successfully!" });
+  } catch (err) {
+    console.error("Failed to send OTP:", err);
+    res.status(500).json({ message: "Failed to send OTP. Please try again." });
+  }
+});
+
+
+router.post("/resend-otp", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: "Leader email is required" });
+
+  const trimmedEmail = email.trim();
+  const storedOtp = otpStore.get(trimmedEmail);
+
+  if (storedOtp && storedOtp.expiresAt > Date.now()) {
+    return res.status(400).json({ message: "OTP is still valid. No need to resend." });
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+  otpStore.set(trimmedEmail, { otp, expiresAt });
+
+  const mailOptions = {
+    from: `"Event Team" <${process.env.MAIL_SENDER}>`,
+    to: trimmedEmail,
+    subject: "OTP Verification - Team Registration",
+    html: `<p>Your OTP for team registration is: <b>${otp}</b><br>It is valid for 5 minutes.</p>`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "OTP resent successfully!" });
+  } catch (err) {
+    console.error("Failed to resend OTP:", err);
+    res.status(500).json({ message: "Failed to resend OTP. Please try again." });
+  }
+});
+
 
 router.post("/register", validateTeam, async (req, res) => {
   console.log("Received data:", JSON.stringify(req.body, null, 2));
@@ -33,59 +107,68 @@ router.post("/register", validateTeam, async (req, res) => {
 
     delete req.body["g-recaptcha-response"];
 
-    // Validate members
+    const leaderEmail = req.body.leader.email.trim();
+    const { emailOtp } = req.body;
+
+    const stored = otpStore.get(leaderEmail);
+    if (!stored || stored.otp !== emailOtp || stored.expiresAt < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    otpStore.delete(leaderEmail); 
+
     if (!req.body.members || !Array.isArray(req.body.members) || req.body.members.length !== 2) {
       return res.status(400).json({ message: "members is required and should contain exactly 2 members." });
     }
 
-    // Trim teamName to avoid accidental duplicates with extra spaces
     req.body.teamName = req.body.teamName.trim();
 
-    // Conflict checks one-by-one
     const duplicateFields = [];
 
-    const teamWithSameName = await Team.findOne({ teamName: req.body.teamName });
-    if (teamWithSameName) {
+    if (await Team.findOne({ teamName: req.body.teamName })) {
       duplicateFields.push("Team name is already taken");
     }
 
-    const leaderEmailExists = await Team.findOne({ "leader.email": req.body.leader.email });
-    if (leaderEmailExists) {
+    if (await Team.findOne({ "leader.email": leaderEmail })) {
       duplicateFields.push("Leader email is already registered");
     }
 
-    const leaderStudentNumberExists = await Team.findOne({ "leader.studentNumber": req.body.leader.studentNumber });
-    if (leaderStudentNumberExists) {
+    if (await Team.findOne({ "leader.studentNumber": req.body.leader.studentNumber })) {
       duplicateFields.push("Leader student number is already registered");
     }
 
-    const leaderMobileExists = await Team.findOne({ "leader.mobile": req.body.leader.mobile });
-    if (leaderMobileExists) {
+    if (await Team.findOne({ "leader.mobile": req.body.leader.mobile })) {
       duplicateFields.push("Leader mobile number is already registered");
     }
 
     const memberStudentNumbers = req.body.members.map(m => m.studentNumber);
-    const conflictingMember = await Team.findOne({
-      "members.studentNumber": { $in: memberStudentNumbers }
-    });
-    if (conflictingMember) {
+    if (await Team.findOne({ "members.studentNumber": { $in: memberStudentNumbers } })) {
       duplicateFields.push("One or more team member student numbers are already registered");
     }
 
     if (duplicateFields.length > 0) {
-      return res.status(409).json({
-        message: "Duplicate data found",
-        conflicts: duplicateFields
-      });
-    }
-
-    // Optional logging
-    if (req.body.leader.hackerRankId) {
-      console.log("HackerRank ID:", req.body.leader.hackerRankId);
+      return res.status(409).json({ message: "Duplicate data found", conflicts: duplicateFields });
     }
 
     const newTeam = new Team(req.body);
     await newTeam.save();
+
+    // ✅ Send confirmation email
+    const confirmationOptions = {
+      from: `"Event Team" <${process.env.MAIL_SENDER}>`,
+      to: leaderEmail,
+      subject: "Team Registered Successfully 🎉",
+      html: `
+        <p>Hi <b>${req.body.leader.name}</b>,</p>
+        <p>Your team <b>${req.body.teamName}</b> has been successfully registered!</p>
+        <p>We're excited to have you onboard. All the best!</p>
+        <br>
+        <p>– Event Team</p>
+      `
+    };
+
+    await transporter.sendMail(confirmationOptions);
+
     res.status(201).json({ message: "Team registered successfully!" });
   } catch (err) {
     console.error("Registration error:", err);
