@@ -1,4 +1,4 @@
-import express from "express";   
+import express from "express";    
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import teamRoutes from "./api/teamRoutes.js";
@@ -18,7 +18,11 @@ if (process.env.NODE_ENV === "production") {
 }
 
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,6 +35,7 @@ app.use("/api/teams", teamRoutes);
 
 
 app.use((err, req, res, next) => {
+  console.error("🔥 Uncaught Server Error:", err.message);
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong, please try again later." });
 });
