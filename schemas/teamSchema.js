@@ -51,10 +51,10 @@ export const teamSchema = Joi.object({
           .pattern(/^\d+$/)
           .required(),
         year: Joi.string()
-          .valid("1st", "2nd", "3rd", "4th")
+          .valid("1st", "2nd")
           .required(),
         gender: Joi.string()
-          .valid("Male", "Female", "Other")
+          .valid("Male", "Female")
           .required(),
         residency: Joi.string()
           .valid("Hosteller", "Day Scholar")

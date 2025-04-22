@@ -153,7 +153,7 @@ router.post("/register", validateTeam, async (req, res) => {
     const newTeam = new Team(req.body);
     await newTeam.save();
 
-    // ✅ Send confirmation email
+
     const confirmationOptions = {
       from: `"Event Team" <${process.env.MAIL_SENDER}>`,
       to: leaderEmail,
