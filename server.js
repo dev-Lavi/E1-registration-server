@@ -17,11 +17,8 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
+app.use(cors());
 
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
 
 
 app.use(express.json());

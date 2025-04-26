@@ -20,9 +20,8 @@ const transporter = nodemailer.createTransport({
 });
 
 
-
 router.post("/send-otp", async (req, res) => {
-  const { email } = req.body;
+  const { email, name } = req.body;  // <-- also receiving 'name' now
   if (!email) return res.status(400).json({ message: "Leader email is required" });
 
   const trimmedEmail = email.trim();
@@ -32,10 +31,38 @@ router.post("/send-otp", async (req, res) => {
   otpStore.set(trimmedEmail, { otp, expiresAt });
 
   const mailOptions = {
-    from: `"Event Team" <${process.env.MAIL_SENDER}>`,
+    from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
     to: trimmedEmail,
     subject: "OTP Verification - Team Registration",
-    html: `<p>Your OTP is: <b>${otp}</b><br>Valid for 5 minutes.</p>`
+    html: `
+<body style="font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 0;"> 
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+
+    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+        <div style="background: linear-gradient(135deg, #001f3f, #0074D9); color: white; padding: 20px; text-align: center;">
+            <img src="https://i.ibb.co/Tk83nxf/b-logo.png" alt="logo" style="height: 70px; width: auto; margin-bottom: 10px;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 600; font-family: 'Audiowide', sans-serif;">Heist of Acropolis</h1>
+        </div>
+            <div style="padding: 30px;">
+                <h2 style="color: #4a4a4a; margin-top: 0;">Hello, <span style="color: #6e8efb; font-weight: 600;">${name || "Participant"}</span>!</h2>
+                <p>Use the following One-Time Password (OTP) to verify your email address:</p>
+                
+                <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                    <h1 style="margin: 0; font-size: 36px; color: #6e8efb;">${otp}</h1>
+                </div>
+
+                <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
+
+                <p>If you did not request this, you can safely ignore this email.</p>
+
+                <p>Thank you,<br><strong>Team Conatus</strong></p>
+            </div>
+            <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
+                <p><strong>Team Conatus</strong><br>Learn. Improvise. Grow.</p>
+            </div>
+        </div>
+      </body>
+    `
   };
 
   try {
@@ -46,6 +73,7 @@ router.post("/send-otp", async (req, res) => {
     res.status(500).json({ message: "Failed to send OTP. Please try again." });
   }
 });
+
 
 
 
@@ -136,11 +164,59 @@ router.post("/register", validateTeam, async (req, res) => {
       to: leaderEmail,
       subject: "Team Registered Successfully 🎉",
       html: `
-        <p>Hi <b>${req.body.leader.name}</b>,</p>
-        <p>Your team <b>${req.body.teamName}</b> has been successfully registered!</p>
-        <br><p>–Team Conatus</p>
+<body style="font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 0;"> 
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+
+    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+        <div style="background: linear-gradient(135deg, #001f3f, #0074D9); color: white; padding: 20px; text-align: center;">
+            <img src="https://i.ibb.co/Tk83nxf/b-logo.png" alt="logo" style="height: 70px; width: auto; margin-bottom: 10px;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 600; font-family: 'Audiowide', sans-serif;">Heist of Acropolis</h1>
+        </div>
+
+        <div style="padding: 30px;">
+            <h2 style="color: #4a4a4a; margin-top: 0;">Dear Participants,</h2>
+            <p>Congratulations, you have been successfully registered for the thrilling 2-day event <strong>Heist of Acropolis</strong>!</p>
+
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                <h3 style="margin-top: 0; color: #0074D9;">📝 Note:</h3>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 10px;">Ensure all the team members are present on the day of the event.</li>
+                    <li style="margin-bottom: 10px;">Be on time to get the most out of the event.</li>
+                </ul>
+            </div>
+
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                <h3 style="margin-top: 0; color: #0074D9;">📍 Event Details:</h3>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
+                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st - 2nd</li>
+                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:00 PM to 6:30 PM</li>
+                </ul>
+            </div>
+
+            <p>Stay connected with us on Instagram for event updates! 📱<br>
+            Follow us here: <a href="https://bit.ly/instagram_conatus" style="color: #0074D9; text-decoration: none;">@teamconatus</a></p>
+
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-top: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
+                <p>If you have any questions or concerns leading up to the event, feel free to reach out:</p>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 10px;">Phone: 9917656889, 9569837249</li>
+                    <li style="margin-bottom: 10px;">Help Desk: CS/IT Block (BB Block)</li>
+                    <li style="margin-bottom: 10px;">After 4 PM: CSE Lab 4 (4th Floor, CS/IT Block)</li>
+                </ul>
+            </div>
+
+            <p>Thank you for being a part of this exciting event! We look forward to providing you with an enriching experience.</p>
+        </div>
+
+        <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
+            <p><strong>Team Conatus</strong><br>Learn. Improvise. Grow.</p>
+        </div>
+    </div>
+</body>
       `
-    };
+    };    
 
     await transporter.sendMail(confirmationOptions);
     res.status(201).json({ message: "Team registered successfully!" });
