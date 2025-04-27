@@ -25,6 +25,17 @@ router.post("/send-otp", async (req, res) => {
   if (!email) return res.status(400).json({ message: "Leader email is required" });
 
   const trimmedEmail = email.trim();
+
+  try {
+    const existingTeam = await Team.findOne({ 'leader.email': trimmedEmail }); // Check the leader's email in the Team model
+    if (existingTeam) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+  } catch (err) {
+    console.error("Error checking email:", err);
+    return res.status(500).json({ message: "Server error. Please try again later." });
+  }
+
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = Date.now() + 2 * 60 * 1000;
 

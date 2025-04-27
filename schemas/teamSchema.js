@@ -1,4 +1,4 @@
-import Joi from "joi"; 
+import Joi from "joi";
 
 export const teamSchema = Joi.object({
   teamName: Joi.string()
@@ -19,8 +19,13 @@ export const teamSchema = Joi.object({
   leader: Joi.object({
     name: Joi.string().min(3).required(),
     studentNumber: Joi.string()
-      .pattern(/^(23|24)\d{2,8}$/)
-      .required(),
+      .pattern(/^(23|24)\d{2,8}$/)  // Matches student numbers starting with 23 or 24 and has 4 to 10 digits
+      .min(4)
+      .max(10)
+      .required()
+      .messages({
+        "string.pattern.base": "Student number should start with 23 or 24 and be between 4 to 10 digits long."
+      }),
     year: Joi.string()
       .valid("1st", "2nd")
       .required(),
@@ -48,8 +53,13 @@ export const teamSchema = Joi.object({
       Joi.object({
         name: Joi.string().min(3).required(),
         studentNumber: Joi.string()
-          .pattern(/^(23|24)\d{2,8}$/)
-          .required(),
+          .pattern(/^(23|24)\d{2,8}$/)  // Same pattern for members
+          .min(4)
+          .max(10)
+          .required()
+          .messages({
+            "string.pattern.base": "Student number should start with 23 or 24 and be between 4 to 10 digits long."
+          }),
         year: Joi.string()
           .valid("1st", "2nd")
           .required(),
