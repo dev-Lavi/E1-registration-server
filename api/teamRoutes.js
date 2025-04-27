@@ -175,8 +175,10 @@ router.post("/register", validateTeam, async (req, res) => {
 
         <div style="padding: 30px;">
             <h2 style="color: #4a4a4a; margin-top: 0;">Dear Participants,</h2>
-            <p>Congratulations, you have been successfully registered for the thrilling 2-day event <strong>Heist of Acropolis</strong>!</p>
-
+            <p>The countdown begins! You’re all set for the <strong>Heist of Acropolis </strong>experience!</p>
+            <p>
+Sharpen your wits, trust your instincts, and prepare for an adrenaline rush like never before.
+Your ultimate adventure awaits — let the heist begin!</p>
             <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
                 <h3 style="margin-top: 0; color: #0074D9;">📝 Note:</h3>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
@@ -190,7 +192,7 @@ router.post("/register", validateTeam, async (req, res) => {
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
                     <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st - 2nd</li>
-                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:00 PM to 6:30 PM</li>
+                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:15 PM to 6:45 PM</li>
                 </ul>
             </div>
 
@@ -201,13 +203,14 @@ router.post("/register", validateTeam, async (req, res) => {
                 <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
                 <p>If you have any questions or concerns leading up to the event, feel free to reach out:</p>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
-                    <li style="margin-bottom: 10px;">Phone: 9917656889, 9569837249</li>
-                    <li style="margin-bottom: 10px;">Help Desk: CS/IT Block (BB Block)</li>
-                    <li style="margin-bottom: 10px;">After 4 PM: CSE Lab 4 (4th Floor, CS/IT Block)</li>
+                    <li style="margin-bottom: 10px;"> <strong>Phone: </strong>Yuga: 8090822729, Subh: 8171915632</li>
+                    <li style="margin-bottom: 10px;"><strong>Help Desk: </strong>CS/IT Block (BB Block)</li>
+                    <li style="margin-bottom: 10px;"><strong>After 4 PM: </strong>CSE Lab 4 (4th Floor, CS/IT Block)</li>
                 </ul>
             </div>
 
-            <p>Thank you for being a part of this exciting event! We look forward to providing you with an enriching experience.</p>
+            <p>We're thrilled to have you join our crew for the ultimate heist.
+Get ready — this is an experience you'll be talking about for a long time!</p>
         </div>
 
         <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
@@ -226,5 +229,88 @@ router.post("/register", validateTeam, async (req, res) => {
     res.status(500).json({ message: "Server error, please try again later." });
   }
 });
+
+router.get("/send-instruction-mail", async (req, res) => {
+  try {
+    const teams = await Team.find({}, { "leader.email": 1, "leader.name": 1, _id: 0 });
+
+    if (teams.length === 0) {
+      return res.status(404).json({ message: "No teams found to send instructions." });
+    }
+
+    for (const team of teams) {
+      const leaderEmail = team.leader.email.trim();
+      const leaderName = team.leader.name || "Participant";
+
+      const instructionMailOptions = {
+        from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
+        to: leaderEmail,
+        subject: "Final Instructions - Heist of Acropolis 🔥",
+        html: `
+<body style="font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 0;"> 
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+
+    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+        <div style="background: linear-gradient(135deg, #001f3f, #0074D9); color: white; padding: 20px; text-align: center;">
+            <img src="https://i.ibb.co/Tk83nxf/b-logo.png" alt="logo" style="height: 70px; width: auto; margin-bottom: 10px;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 600; font-family: 'Audiowide', sans-serif;">Heist of Acropolis</h1>
+        </div>
+
+        <div style="padding: 30px;">
+            <h2 style="color: #4a4a4a; margin-top: 0;">Dear Participants,</h2>
+            <p>We hope you are excited and ready for the thrilling 2-day event, <strong>"Heist of Acropolis"</strong>!</p>
+            <p>Here's everything you need to know before the heist:</p>
+
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                <h3 style="margin-top: 0; color: #0074D9;">📝 Important Instructions:</h3>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 10px;">Remember your login credentials <b>[Email id, HackerRank: id, password]</b> that you used during registration. You'll need these to participate in the contest.</li>
+                    <li style="margin-bottom: 10px;">Hostel girls must register their entry in the permission register.</li>
+                    <li style="margin-bottom: 10px;">No need to bring laptops — PCs will be provided.</li>
+                    <li style="margin-bottom: 10px;">All team members must be present during the event.</li>
+                </ul>
+            </div>
+
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                <h3 style="margin-top: 0; color: #0074D9;">📍 Event Details:</h3>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
+                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st</li>
+                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:15 PM to 6:45 PM</li>
+                </ul>
+            </div>
+
+            <p>Stay updated with the latest event news 📱<br>
+            Follow us on Instagram: <a href="https://bit.ly/instagram_conatus" style="color: #0074D9; text-decoration: none;">@teamconatus</a></p>
+
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-top: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
+                <p>If you have any queries, feel free to reach out:</p>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 10px;">Phone: Yuga: 8090822729, Subh: 8171915632</li>
+                </ul>
+            </div>
+
+            <p>Let’s turn the <strong>"Heist of Acropolis"</strong> into an epic triumph!</p>
+        </div>
+
+        <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
+            <p><strong>Team Conatus</strong><br>Learn. Improvise. Grow.</p>
+        </div>
+    </div>
+</body>
+        `
+      };
+
+      await transporter.sendMail(instructionMailOptions);
+    }
+
+    res.status(200).json({ message: "Instruction mails sent to all team leaders successfully." });
+  } catch (err) {
+    console.error("Error sending instruction mails:", err);
+    res.status(500).json({ message: "Server error while sending instruction mails." });
+  }
+});
+
 
 export default router;
