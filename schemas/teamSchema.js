@@ -19,13 +19,13 @@ export const teamSchema = Joi.object({
   leader: Joi.object({
     name: Joi.string().min(3).required(),
     studentNumber: Joi.string()
-      .pattern(/^\d+$/)
+      .pattern(/^(23|24)\d{2,8}$/)
       .required(),
     year: Joi.string()
-      .valid("1st", "2nd", "3rd", "4th")
+      .valid("1st", "2nd")
       .required(),
     gender: Joi.string()
-      .valid("Male", "Female", "Other")
+      .valid("Male", "Female")
       .required(),
     residency: Joi.string()
       .valid("Hosteller", "Day Scholar")
@@ -48,7 +48,7 @@ export const teamSchema = Joi.object({
       Joi.object({
         name: Joi.string().min(3).required(),
         studentNumber: Joi.string()
-          .pattern(/^\d+$/)
+          .pattern(/^(23|24)\d{2,8}$/)
           .required(),
         year: Joi.string()
           .valid("1st", "2nd")

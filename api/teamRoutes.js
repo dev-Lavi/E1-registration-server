@@ -26,7 +26,7 @@ router.post("/send-otp", async (req, res) => {
 
   const trimmedEmail = email.trim();
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = Date.now() + 5 * 60 * 1000;
+  const expiresAt = Date.now() + 2 * 60 * 1000;
 
   otpStore.set(trimmedEmail, { otp, expiresAt });
 
@@ -51,7 +51,7 @@ router.post("/send-otp", async (req, res) => {
                     <h1 style="margin: 0; font-size: 36px; color: #6e8efb;">${otp}</h1>
                 </div>
 
-                <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
+                <p>This OTP is valid for <strong>2 minutes</strong>. Please do not share it with anyone.</p>
 
                 <p>If you did not request this, you can safely ignore this email.</p>
 
@@ -192,7 +192,7 @@ Your ultimate adventure awaits — let the heist begin!</p>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
                     <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st - 2nd</li>
-                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:15 PM to 6:45 PM</li>
+                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:00 PM to 6:45 PM</li>
                 </ul>
             </div>
 
@@ -276,7 +276,7 @@ router.get("/send-instruction-mail", async (req, res) => {
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
                     <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st</li>
-                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:15 PM to 6:45 PM</li>
+                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:00 PM to 6:45 PM</li>
                 </ul>
             </div>
 
