@@ -8,7 +8,7 @@ import helmet from "helmet";
 import cors from "cors";
 
 const allowedOrigins = [
-  'https://www.kryptonmind.tech/register' 
+  'https://www.kryptonmind.tech' 
 ];
 
 dotenv.config();
