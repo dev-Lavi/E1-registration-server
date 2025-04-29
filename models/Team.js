@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const teamSchema = new mongoose.Schema({
-  teamName: { type: String, required: true, unique: true }, // ✅ Added unique constraint here
+  teamName: { type: String, required: true, unique: true }, 
   leader: {
     name: { type: String, required: true },
     studentNumber: { type: String, required: true },

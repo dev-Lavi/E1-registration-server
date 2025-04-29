@@ -21,13 +21,13 @@ const transporter = nodemailer.createTransport({
 
 
 router.post("/send-otp", async (req, res) => {
-  const { email, name } = req.body;  // <-- also receiving 'name' now
+  const { email, name } = req.body;  
   if (!email) return res.status(400).json({ message: "Leader email is required" });
 
   const trimmedEmail = email.trim();
 
   try {
-    const existingTeam = await Team.findOne({ 'leader.email': trimmedEmail }); // Check the leader's email in the Team model
+    const existingTeam = await Team.findOne({ 'leader.email': trimmedEmail }); 
     if (existingTeam) {
       return res.status(400).json({ message: "Email already exists" });
     }
