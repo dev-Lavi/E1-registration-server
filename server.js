@@ -7,6 +7,11 @@ import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import cors from "cors";
 
+const allowedOrigins = [
+  'https://www.kryptonmind.tech',
+  'http://localhost:5173' 
+];
+
 dotenv.config();
 connectDB();
 
@@ -18,7 +23,14 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(cors({
-  origin: 'https://www.kryptonmind.tech/'
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true 
 }));
 
 
