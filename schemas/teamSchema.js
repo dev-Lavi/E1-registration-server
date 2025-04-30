@@ -19,7 +19,7 @@ export const teamSchema = Joi.object({
   leader: Joi.object({
     name: Joi.string().min(3).required(),
     studentNumber: Joi.string()
-      .pattern(/^(23|24)\d{2,8}$/)  // Matches student numbers starting with 23 or 24 and has 4 to 10 digits
+      .pattern(/^(23|24)\d{2,8}$/)  
       .min(4)
       .max(10)
       .required()
@@ -53,7 +53,7 @@ export const teamSchema = Joi.object({
       Joi.object({
         name: Joi.string().min(3).required(),
         studentNumber: Joi.string()
-          .pattern(/^(23|24)\d{2,8}$/)  // Same pattern for members
+          .pattern(/^(23|24)\d{2,8}$/)  
           .min(4)
           .max(10)
           .required()

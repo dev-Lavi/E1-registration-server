@@ -26,6 +26,10 @@ router.post("/send-otp", async (req, res) => {
 
   const trimmedEmail = email.trim();
 
+  if (!trimmedEmail.endsWith("@akgec.ac.in")) {
+    return res.status(400).json({ message: "Leader email must end with '@akgec.ac.in'" });
+  }
+
   try {
     const existingTeam = await Team.findOne({ 'leader.email': trimmedEmail }); 
     if (existingTeam) {

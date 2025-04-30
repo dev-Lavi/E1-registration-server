@@ -3,8 +3,16 @@ export const validateTeam = (req, res, next) => {
 
   const { leader, members, emailOtp } = req.body;
 
-  if (!leader || !leader.email || !leader.studentNumber || !leader.mobile) {
+  if (!leader || !leader.email || !leader.studentNumber || !leader.mobile) { 
     return res.status(400).json({ message: "Leader details are incomplete." });
+  }
+  
+  const emailDomain = "@akgec.ac.in";
+
+  if (!leader.email.endsWith(emailDomain)) {
+    return res.status(400).json({
+      message: `Leader email must end with '${emailDomain}'.`
+    });
   }
 
   const studentNumberPattern = /^(23|24)\d{2,8}$/; 
