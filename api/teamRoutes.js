@@ -218,7 +218,7 @@ Your ultimate adventure awaits — let the heist begin!</p>
                 <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
                 <p>If you have any questions or concerns leading up to the event, feel free to reach out:</p>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
-                    <li style="margin-bottom: 10px;"> <strong>Phone: </strong>Yuga: 8090822729, Subh: 8171915632</li>
+                    <li style="margin-bottom: 10px;"> <strong>Phone: </strong>Yuga: 8090822729, Shubh: 8171915632</li>
                     <li style="margin-bottom: 10px;"><strong>Help Desk: </strong>CS/IT Block (BB Block)</li>
                     <li style="margin-bottom: 10px;"><strong>After 4 PM: </strong>CSE Lab 4 (4th Floor, CS/IT Block)</li>
                 </ul>
@@ -302,7 +302,7 @@ router.get("/send-instruction-mail", async (req, res) => {
                 <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
                 <p>If you have any queries, feel free to reach out:</p>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
-                    <li style="margin-bottom: 10px;">Phone: Yuga: 8090822729, Subh: 8171915632</li>
+                    <li style="margin-bottom: 10px;">Phone: Yuga: 8090822729, Shubh: 8171915632</li>
                 </ul>
             </div>
 
