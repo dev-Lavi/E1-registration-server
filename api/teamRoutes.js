@@ -5,12 +5,31 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { validateTeam } from "../middleware/validateTeam.js";
+import { otpLimiter, registerLimiter } from "../middleware/rateLimiter.js";
+
 
 dotenv.config();
 const router = express.Router();
 
 const otpStore = new Map(); 
 const verifiedEmails = new Set(); 
+
+const getRealIP = (req) => req.headers["cf-connecting-ip"] || req.ip;
+
+// Rate limiters
+const otpLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 3,
+  keyGenerator: getRealIP,
+  message: "Too many OTP requests. Please wait a minute and try again.",
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 2,
+  keyGenerator: getRealIP,
+  message: "Too many registration attempts. Please try again later.",
+});
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -21,7 +40,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-router.post("/send-otp", async (req, res) => {
+router.post("/send-otp", otpLimiter, async (req, res) => {
   const { email, studentNumber, "g-recaptcha-response": recaptchaToken } = req.body;
 
   if (!email) return res.status(400).json({ message: "Leader email is required" });
@@ -146,7 +165,7 @@ router.post("/verify-otp", (req, res) => {
 
 
 
-router.post("/register", (req, res, next) => {
+router.post("/register", registerLimiter, (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // Check if the Authorization header exists and starts with "Bearer"

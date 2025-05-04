@@ -1,16 +1,20 @@
-import rateLimit from "express-rate-limit"; 
+import rateLimit from "express-rate-limit";
 
-// Function to get the real IP address from Cloudflare header
-const getRealIP = (req) => {
-  return req.headers['cf-connecting-ip'] || req.connection.remoteAddress;
-};
+// Helper to get real IP from Cloudflare
+const getRealIP = (req) => req.headers["cf-connecting-ip"] || req.ip;
 
-// Create the rate limiter middleware
-const rateLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 10 minutes
-  max: 3, // limit each IP to 10 requests per windowMs
-  keyGenerator: (req) => getRealIP(req), // Use the real IP from Cloudflare's header
-  message: "Too many requests, please try again later.", // Custom message
+// OTP limiter (3 requests per minute)
+export const otpLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 3,
+  keyGenerator: getRealIP,
+  message: "Too many OTP requests, please try again in 1 minute.",
 });
 
-export default rateLimiter;
+// Register limiter (2 requests per 10 minutes)
+export const registerLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 2,
+  keyGenerator: getRealIP,
+  message: "Too many registration attempts. Try again later.",
+});
