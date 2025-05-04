@@ -94,7 +94,7 @@ router.post("/send-otp", async (req, res) => {
             <h1 style="margin: 0; font-size: 28px; font-weight: 600; font-family: 'Audiowide', sans-serif;">Heist of Acropolis</h1>
           </div>
           <div style="padding: 30px;">
-            <h2 style="color: #4a4a4a; margin-top: 0;">Hello, <span style="color: #6e8efb; font-weight: 600;">${name || "Participant"}</span>!</h2>
+            <h2 style="color: #4a4a4a; margin-top: 0;">Hello, <span style="color: #6e8efb; font-weight: 600;">${"Participant"}</span>!</h2>
             <p>Thank you for registering for Heist of Acropolis! Please use the following One-Time Password (OTP) to verify your email address:</p>
             <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
               <h1 style="margin: 0; font-size: 36px; color: #6e8efb;">${otp}</h1>
