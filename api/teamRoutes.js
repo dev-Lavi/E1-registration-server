@@ -3,6 +3,7 @@ import axios from "axios";
 import Team from "../models/Team.js";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
 import { validateTeam } from "../middleware/validateTeam.js";
 
 dotenv.config();
@@ -21,17 +22,50 @@ const transporter = nodemailer.createTransport({
 
 
 router.post("/send-otp", async (req, res) => {
-  const { email, name } = req.body;  
-  if (!email) return res.status(400).json({ message: "Leader email is required" });
+  const { email, name, studentNumber, "g-recaptcha-response": recaptchaToken } = req.body;
 
-  const trimmedEmail = email.trim();
+  if (!email) return res.status(400).json({ message: "Leader email is required" });
+  if (!recaptchaToken) return res.status(400).json({ message: "reCAPTCHA challenge incomplete" });
+  if (!studentNumber || !/^\d{11}$/.test(studentNumber)) {
+    return res.status(400).json({ message: "Invalid or missing student number" });
+  }
+
+  const trimmedEmail = email.trim().toLowerCase();
+
+  // ✅ reCAPTCHA verification
+  try {
+    const captchaResponse = await axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      null,
+      {
+        params: {
+          secret: process.env.reCAPTCHA_secret_key,
+          response: recaptchaToken
+        }
+      }
+    );
+
+    if (!captchaResponse.data.success) {
+      return res.status(400).json({ message: "reCAPTCHA verification failed!" });
+    }
+  } catch (error) {
+    console.error("reCAPTCHA error:", error);
+    return res.status(500).json({ message: "reCAPTCHA verification failed. Please try again." });
+  }
 
   if (!trimmedEmail.endsWith("@akgec.ac.in")) {
     return res.status(400).json({ message: "Leader email must end with '@akgec.ac.in'" });
   }
 
+  // Optional strict check: email must match student number
+  const expectedEmail = `${studentNumber}@akgec.ac.in`;
+  if (trimmedEmail !== expectedEmail) {
+    return res.status(400).json({ message: "Email does not match student number" });
+  }
+
+  // ✅ Check if team already registered with this email
   try {
-    const existingTeam = await Team.findOne({ 'leader.email': trimmedEmail }); 
+    const existingTeam = await Team.findOne({ 'leader.email': trimmedEmail });
     if (existingTeam) {
       return res.status(400).json({ message: "Email already exists" });
     }
@@ -42,41 +76,36 @@ router.post("/send-otp", async (req, res) => {
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = Date.now() + 2 * 60 * 1000;
-
   otpStore.set(trimmedEmail, { otp, expiresAt });
+
+  const jwtPayload = { email: trimmedEmail, studentNumber };
+  const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: "10m" });
 
   const mailOptions = {
     from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
     to: trimmedEmail,
     subject: "OTP Verification - Team Registration",
     html: `
-<body style="font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 0;"> 
-    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-
-    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
-        <div style="background: linear-gradient(135deg, #001f3f, #0074D9); color: white; padding: 20px; text-align: center;">
+      <body style="font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 0;"> 
+        <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+        <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+          <div style="background: linear-gradient(135deg, #001f3f, #0074D9); color: white; padding: 20px; text-align: center;">
             <img src="https://i.ibb.co/Tk83nxf/b-logo.png" alt="logo" style="height: 70px; width: auto; margin-bottom: 10px;">
             <h1 style="margin: 0; font-size: 28px; font-weight: 600; font-family: 'Audiowide', sans-serif;">Heist of Acropolis</h1>
-        </div>
-            <div style="padding: 30px;">
-                <h2 style="color: #4a4a4a; margin-top: 0;">Hello, <span style="color: #6e8efb; font-weight: 600;">${name || "Participant"}</span>!</h2>
-                <p>Thank you for registering for Heist of Acropolis!
-Please use the following One-Time Password (OTP) to verify your email address:
-</p>
-                
-                <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-                    <h1 style="margin: 0; font-size: 36px; color: #6e8efb;">${otp}</h1>
-                </div>
-
-                <p>This OTP is valid for <strong>2 minutes</strong>. Please do not share it with anyone for security reasons.</p>
-
-                <p>If you did not initiate this request, feel free to ignore this email.</p>
-
-                <p>Best regards,<br><strong>Team Conatus</strong></p>
+          </div>
+          <div style="padding: 30px;">
+            <h2 style="color: #4a4a4a; margin-top: 0;">Hello, <span style="color: #6e8efb; font-weight: 600;">${name || "Participant"}</span>!</h2>
+            <p>Thank you for registering for Heist of Acropolis! Please use the following One-Time Password (OTP) to verify your email address:</p>
+            <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+              <h1 style="margin: 0; font-size: 36px; color: #6e8efb;">${otp}</h1>
             </div>
-            <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
-                <p><strong>Team Conatus</strong><br>Learn. Improvise. Grow.</p>
-            </div>
+            <p>This OTP is valid for <strong>2 minutes</strong>. Please do not share it with anyone for security reasons.</p>
+            <p>If you did not initiate this request, feel free to ignore this email.</p>
+            <p>Best regards,<br><strong>Team Conatus</strong></p>
+          </div>
+          <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
+            <p><strong>Team Conatus</strong><br>Learn. Improvise. Grow.</p>
+          </div>
         </div>
       </body>
     `
@@ -84,10 +113,13 @@ Please use the following One-Time Password (OTP) to verify your email address:
 
   try {
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "OTP sent successfully!" });
+    return res.status(200).json({
+      message: "OTP sent successfully!",
+      token: jwtToken
+    });
   } catch (err) {
     console.error("Failed to send OTP:", err);
-    res.status(500).json({ message: "Failed to send OTP. Please try again." });
+    return res.status(500).json({ message: "Failed to send OTP. Please try again." });
   }
 });
 
@@ -113,40 +145,35 @@ router.post("/verify-otp", (req, res) => {
 
 
 
+
 router.post("/register", validateTeam, async (req, res) => {
-  const recaptchaToken = req.body["g-recaptcha-response"];
-  if (!recaptchaToken) {
-    return res.status(400).json({ message: "reCAPTCHA challenge incomplete" });
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization token missing or malformed" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+
+  const leaderEmail = decoded.email?.trim();
+  if (!leaderEmail) {
+    return res.status(400).json({ message: "Email missing in token" });
   }
 
   try {
-    const response = await axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      null,
-      {
-        params: {
-          secret: process.env.reCAPTCHA_secret_key,
-          response: recaptchaToken
-        }
-      }
-    );
-
-    if (!response.data.success) {
-      return res.status(400).json({ message: "reCAPTCHA verification failed!" });
-    }
-
-    delete req.body["g-recaptcha-response"];
-
-    const leaderEmail = req.body.leader.email.trim();
-    if (!verifiedEmails.has(leaderEmail)) {
-      return res.status(403).json({ message: "Email not verified via OTP" });
-    }
-
     if (!req.body.members || !Array.isArray(req.body.members) || req.body.members.length !== 2) {
       return res.status(400).json({ message: "members is required and should contain exactly 2 members." });
     }
 
     req.body.teamName = req.body.teamName.trim();
+    req.body.leader.email = leaderEmail; // Force leader email from JWT
+
     const duplicateFields = [];
 
     if (await Team.findOne({ teamName: req.body.teamName })) {
@@ -174,7 +201,7 @@ router.post("/register", validateTeam, async (req, res) => {
     const newTeam = new Team(req.body);
     await newTeam.save();
 
-    verifiedEmails.delete(leaderEmail); 
+    verifiedEmails.delete(leaderEmail);
 
     const confirmationOptions = {
       from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
@@ -246,6 +273,9 @@ Get ready — this is an experience you'll be talking about for a long time!<
     res.status(500).json({ message: "Server error, please try again later." });
   }
 });
+
+
+
 
 router.get("/send-instruction-mail", async (req, res) => {
   try {
