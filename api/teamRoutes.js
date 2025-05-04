@@ -165,7 +165,7 @@ router.post("/verify-otp", (req, res) => {
 
 
 
-router.post("/register", registerLimiter, (req, res, next) => {
+router.post("/register", (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // Check if the Authorization header exists and starts with "Bearer"
