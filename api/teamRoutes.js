@@ -22,12 +22,12 @@ const transporter = nodemailer.createTransport({
 
 
 router.post("/send-otp", async (req, res) => {
-  const { email, name, studentNumber, "g-recaptcha-response": recaptchaToken } = req.body;
+  const { email, studentNumber, "g-recaptcha-response": recaptchaToken } = req.body;
 
   if (!email) return res.status(400).json({ message: "Leader email is required" });
   if (!recaptchaToken) return res.status(400).json({ message: "reCAPTCHA challenge incomplete" });
-  if (!studentNumber || !/^\d{11}$/.test(studentNumber)) {
-    return res.status(400).json({ message: "Invalid or missing student number" });
+  if (!studentNumber || !/^(23|24)\d{2,8}$/.test(studentNumber)) {
+    return res.status(400).json({ message: "Student number must start with 23 or 24 and be between 4 and 10 digits." });
   }
 
   const trimmedEmail = email.trim().toLowerCase();
@@ -58,8 +58,8 @@ router.post("/send-otp", async (req, res) => {
   }
 
   // Optional strict check: email must match student number
-  const expectedEmail = `${studentNumber}@akgec.ac.in`;
-  if (trimmedEmail !== expectedEmail) {
+  const emailPrefix = trimmedEmail.split('@')[0]; // Extract the part before "@akgec.ac.in"
+  if (!emailPrefix.startsWith(studentNumber)) {
     return res.status(400).json({ message: "Email does not match student number" });
   }
 
