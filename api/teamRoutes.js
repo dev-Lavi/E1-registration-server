@@ -60,17 +60,19 @@ router.post("/send-otp", async (req, res) => {
         </div>
             <div style="padding: 30px;">
                 <h2 style="color: #4a4a4a; margin-top: 0;">Hello, <span style="color: #6e8efb; font-weight: 600;">${name || "Participant"}</span>!</h2>
-                <p>Use the following One-Time Password (OTP) to verify your email address:</p>
+                <p>Thank you for registering for Heist of Acropolis!
+Please use the following One-Time Password (OTP) to verify your email address:
+</p>
                 
                 <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
                     <h1 style="margin: 0; font-size: 36px; color: #6e8efb;">${otp}</h1>
                 </div>
 
-                <p>This OTP is valid for <strong>2 minutes</strong>. Please do not share it with anyone.</p>
+                <p>This OTP is valid for <strong>2 minutes</strong>. Please do not share it with anyone for security reasons.</p>
 
-                <p>If you did not request this, you can safely ignore this email.</p>
+                <p>If you did not initiate this request, feel free to ignore this email.</p>
 
-                <p>Thank you,<br><strong>Team Conatus</strong></p>
+                <p>Best regards,<br><strong>Team Conatus</strong></p>
             </div>
             <div style="background-color: #4a4a4a; color: white; text-align: center; padding: 20px; font-size: 14px;">
                 <p><strong>Team Conatus</strong><br>Learn. Improvise. Grow.</p>
@@ -206,20 +208,20 @@ Your ultimate adventure awaits — let the heist begin!</p>
                 <h3 style="margin-top: 0; color: #0074D9;">📍 Event Details:</h3>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
-                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st - 2nd</li>
-                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:00 PM to 6:45 PM</li>
+                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 8 - 9</li>
+                    <li style="margin-bottom: 10px;"><strong>Time:</strong> 4:00 PM onwards</li>
                 </ul>
             </div>
 
             <p>Stay connected with us on Instagram for event updates! 📱<br>
-            Follow us here: <a href="https://bit.ly/instagram_conatus" style="color: #0074D9; text-decoration: none;">@teamconatus</a></p>
+            Follow us here: <a href="https://bit.ly/instagram_conatus" style="color: #0074D9; text-decoration: none;">@conatus.akg</a></p>
 
             <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-top: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
                 <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
                 <p>If you have any questions or concerns leading up to the event, feel free to reach out:</p>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"> <strong>Phone: </strong>Yuga: 8090822729, Shubh: 8171915632</li>
-                    <li style="margin-bottom: 10px;"><strong>Help Desk: </strong>CS/IT Block (BB Block)</li>
+                    <li style="margin-bottom: 10px;"><strong>Help Desk: </strong>CS/IT Block </li>
                     <li style="margin-bottom: 10px;"><strong>After 4 PM: </strong>CSE Lab 4 (4th Floor, CS/IT Block)</li>
                 </ul>
             </div>
@@ -290,13 +292,13 @@ router.get("/send-instruction-mail", async (req, res) => {
                 <h3 style="margin-top: 0; color: #0074D9;">📍 Event Details:</h3>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
-                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 1st</li>
-                    <li style="margin-bottom: 10px;"><strong>Duration:</strong> 4:00 PM to 6:45 PM</li>
+                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 8</li>
+                    <li style="margin-bottom: 10px;"><strong>Time:</strong> 4:00 PM onwards</li>
                 </ul>
             </div>
 
             <p>Stay updated with the latest event news 📱<br>
-            Follow us on Instagram: <a href="https://bit.ly/instagram_conatus" style="color: #0074D9; text-decoration: none;">@teamconatus</a></p>
+            Follow us on Instagram: <a href="https://bit.ly/instagram_conatus" style="color: #0074D9; text-decoration: none;">@conatus.akg</a></p>
 
             <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-top: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
                 <h3 style="margin-top: 0; color: #0074D9;">📞 Contact Information:</h3>
