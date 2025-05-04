@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(cors({
-  origin: 'https://www.kryptonmind.tech',
+  origin: 'https://registration.teamconatus.com',
   credentials: true 
 }));
 
