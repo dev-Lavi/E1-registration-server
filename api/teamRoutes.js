@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { validateTeam } from "../middleware/validateTeam.js";
-import { otpLimiter, registerLimiter } from "./middleware/rateLimiter.js"; 
+import { otpLimiter, registerLimiter } from "../middleware/rateLimiter.js"; 
 
 
 dotenv.config();

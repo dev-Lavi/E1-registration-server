@@ -26,10 +26,7 @@ app.use(mongoSanitize());
 app.use(helmet());
 
 
-app.use("/api/teams", rateLimiter.otpLimiter, teamRoutes);  // Corrected usage of the OTP limiter
-app.use("/api/teams", rateLimiter.registerLimiter, teamRoutes);
-
-
+app.use("/api/teams", otpLimiter, teamRoutes);
 
 
 app.use((err, req, res, next) => {
