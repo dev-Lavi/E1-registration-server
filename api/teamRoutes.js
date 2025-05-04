@@ -79,7 +79,7 @@ router.post("/send-otp", async (req, res) => {
   otpStore.set(trimmedEmail, { otp, expiresAt });
 
   const jwtPayload = { email: trimmedEmail, studentNumber };
-  const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: "10m" });
+  const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: "5m" });
 
   const mailOptions = {
     from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
