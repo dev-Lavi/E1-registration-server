@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { validateTeam } from "../middleware/validateTeam.js";
-import { otpLimiter} from "../middleware/rateLimiter.js"; 
+import rateLimiter from "../middleware/rateLimiter.js";
 
 
 dotenv.config();
@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-router.post("/send-otp", otpLimiter, async (req, res) => {
+router.post("/send-otp", rateLimiter, async (req, res) => {
   const { email, studentNumber, "g-recaptcha-response": recaptchaToken } = req.body;
 
   if (!email) return res.status(400).json({ message: "Leader email is required" });

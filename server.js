@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import teamRoutes from "./api/teamRoutes.js";
-import { otpLimiter} from "./middleware/rateLimiter.js";  
+import rateLimiter from "./middleware/rateLimiter.js";  
 import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import cors from "cors";
@@ -26,7 +26,7 @@ app.use(mongoSanitize());
 app.use(helmet());
 
 
-app.use("/api/teams", otpLimiter, teamRoutes);
+app.use("/api/teams", rateLimiter, teamRoutes);
 
 
 app.use((err, req, res, next) => {
