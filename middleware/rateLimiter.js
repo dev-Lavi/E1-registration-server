@@ -12,9 +12,9 @@ export const otpLimiter = rateLimit({
 });
 
 // Register limiter (2 per 10 minutes)
-export const registerLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 min
-  max: 2,
-  keyGenerator: getRealIP,
-  message: "Too many registration attempts. Try again later.",
-});
+//export const registerLimiter = rateLimit({
+  //windowMs: 10 * 60 * 1000, // 10 min
+  //max: 5,
+  //keyGenerator: getRealIP,
+  //message: "Too many registration attempts. Try again later.",
+//});

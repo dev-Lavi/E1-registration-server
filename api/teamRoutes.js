@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { validateTeam } from "../middleware/validateTeam.js";
-import { otpLimiter, registerLimiter } from "../middleware/rateLimiter.js"; 
+import { otpLimiter} from "../middleware/rateLimiter.js"; 
 
 
 dotenv.config();
@@ -149,7 +149,7 @@ router.post("/verify-otp", (req, res) => {
 
 
 
-router.post("/register", registerLimiter, (req, res, next) => {
+router.post("/register", (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // Check if the Authorization header exists and starts with "Bearer"
