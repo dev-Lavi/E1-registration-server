@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import teamRoutes from "./api/teamRoutes.js";
-import rateLimiter from "./middleware/rateLimiter.js";
+import { otpLimiter, registerLimiter } from "./middleware/rateLimiter.js";  
 import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import cors from "cors";
