@@ -208,7 +208,7 @@ Your ultimate adventure awaits — let the heist begin!</p>
                 <h3 style="margin-top: 0; color: #0074D9;">📍 Event Details:</h3>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
-                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 8 - 9</li>
+                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 8th - 9th</li>
                     <li style="margin-bottom: 10px;"><strong>Time:</strong> 4:00 PM onwards</li>
                 </ul>
             </div>
@@ -292,7 +292,7 @@ router.get("/send-instruction-mail", async (req, res) => {
                 <h3 style="margin-top: 0; color: #0074D9;">📍 Event Details:</h3>
                 <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 10px;"><strong>Venue:</strong> CS/IT BLOCK (3rd Floor)</li>
-                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 8</li>
+                    <li style="margin-bottom: 10px;"><strong>Dates:</strong> May 8th</li>
                     <li style="margin-bottom: 10px;"><strong>Time:</strong> 4:00 PM onwards</li>
                 </ul>
             </div>
