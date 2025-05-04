@@ -59,7 +59,7 @@ router.post("/send-otp", async (req, res) => {
 
   // Optional strict check: email must match student number
   const emailPrefix = trimmedEmail.split('@')[0]; // Extract the part before "@akgec.ac.in"
-  if (!emailPrefix.startsWith(studentNumber)) {
+  if (!emailPrefix.includes(studentNumber)) {
     return res.status(400).json({ message: "Email does not match student number" });
   }
 
