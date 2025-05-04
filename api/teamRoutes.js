@@ -146,39 +146,54 @@ router.post("/verify-otp", (req, res) => {
 
 
 
-router.post("/register", validateTeam, async (req, res) => {
+router.post("/register", (req, res, next) => {
   const authHeader = req.headers.authorization;
+
+  // Check if the Authorization header exists and starts with "Bearer"
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Authorization token missing or malformed" });
   }
 
-  const token = authHeader.split(" ")[1];
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
-  }
-
-  const leaderEmail = decoded.email?.trim();
-  if (!leaderEmail) {
-    return res.status(400).json({ message: "Email missing in token" });
-  }
+  const token = authHeader.split(" ")[1]; // Extract the token from the header
 
   try {
-    if (!req.body.members || !Array.isArray(req.body.members) || req.body.members.length !== 2) {
-      return res.status(400).json({ message: "members is required and should contain exactly 2 members." });
+    // Verify the JWT token and decode it
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if the decoded token contains a valid email
+    const leaderEmail = decoded.email?.trim();
+    if (!leaderEmail) {
+      return res.status(400).json({ message: "Email missing in token" });
     }
 
+    // Attach the leader's email to the request body for further validation
+    req.body.leader = req.body.leader || {}; // Ensure `leader` object exists
+    req.body.leader.email = leaderEmail;
+
+    next(); // Proceed to validateTeam middleware
+
+  } catch (err) {
+    // Handle token verification failure
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+}, validateTeam, async (req, res) => {
+  try {
+    // Check if the team members array is valid
+    if (!req.body.members || !Array.isArray(req.body.members) || req.body.members.length !== 2) {
+      return res.status(400).json({ message: "Members is required and should contain exactly 2 members." });
+    }
+
+    // Trim team name and attach leader email from JWT
     req.body.teamName = req.body.teamName.trim();
-    req.body.leader.email = leaderEmail; // Force leader email from JWT
+    req.body.leader.email = req.body.leader.email?.trim(); // Ensure email is trimmed
 
     const duplicateFields = [];
 
+    // Check for duplicate fields in the database
     if (await Team.findOne({ teamName: req.body.teamName })) {
       duplicateFields.push("Team name is already taken");
     }
-    if (await Team.findOne({ "leader.email": leaderEmail })) {
+    if (await Team.findOne({ "leader.email": req.body.leader.email })) {
       duplicateFields.push("Leader email is already registered");
     }
     if (await Team.findOne({ "leader.studentNumber": req.body.leader.studentNumber })) {
@@ -188,19 +203,23 @@ router.post("/register", validateTeam, async (req, res) => {
       duplicateFields.push("Leader mobile number is already registered");
     }
 
+    // Check for duplicate student numbers in members
     const memberStudentNumbers = req.body.members.map(m => m.studentNumber);
     if (await Team.findOne({ "members.studentNumber": { $in: memberStudentNumbers } })) {
       duplicateFields.push("One or more team member student numbers are already registered");
     }
 
+    // If there are duplicate fields, return a conflict response
     if (duplicateFields.length > 0) {
       return res.status(409).json({ message: "Duplicate data found", conflicts: duplicateFields });
     }
 
+    // If no duplicates, create a new team and save to the database
     const newTeam = new Team(req.body);
     await newTeam.save();
 
-    verifiedEmails.delete(leaderEmail);
+    // Remove leader's email from the verified list after registration
+    verifiedEmails.delete(req.body.leader.email);
 
     const confirmationOptions = {
       from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
