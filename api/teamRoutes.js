@@ -226,7 +226,7 @@ router.post("/register", (req, res, next) => {
 
     const confirmationOptions = {
       from: `"Team Conatus" <${process.env.MAIL_SENDER}>`,
-      to: leaderEmail,
+      to: req.body.leader.email,
       subject: "Team Registered Successfully 🎉",
       html: `
 <body style="font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 0;"> 
