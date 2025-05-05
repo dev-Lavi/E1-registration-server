@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-router.post("/send-otp", rateLimiter, async (req, res) => {
+router.post("/send-otp", async (req, res) => {
   const { email, studentNumber, "g-recaptcha-response": recaptchaToken } = req.body;
 
   if (!email) return res.status(400).json({ message: "Leader email is required" });
