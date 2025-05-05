@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize());
 app.use(helmet());
-app.use(rateLimiter);
+
 
 
 app.use("/api/teams", teamRoutes);
